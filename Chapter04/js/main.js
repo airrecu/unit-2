@@ -6,8 +6,9 @@ var map;
 function createMap(){
     //create the map
     map = L.map('map', {
-        center: [20, 0],
-        zoom: 2
+        // center: [20, 0],
+        center: [47.5, 30.9],
+        zoom: 6
     });
 
     //add OSM base tilelayer
@@ -41,8 +42,8 @@ function onEachFeature(feature, layer) {
 //function to retrieve the data and place it on the map
 function getData(){
     //load the data
-    fetch("data/MegaCities.geojson")
-    
+    // fetch("data/MegaCities.geojson")
+    fetch("data/UkraineOblastPopulationHistoryLatLong.geojson")
 
         .then(function(response){
             return response.json();
