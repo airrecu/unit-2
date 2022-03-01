@@ -5,7 +5,7 @@ var minValue;
 //step 1 create map
 function createMap(){
 
-    //create the map
+    //create the map and setup operators
     map = L.map('map', {
         center: [48.0, 30.7],
         zoom: 6
