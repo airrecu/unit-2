@@ -2,13 +2,40 @@
 
 
 
-#map { height: 980px; }
-
-
-
-
-
+/* #map { height: 980px; } */
 
 .leaflet-popup-content p {
     margin: 0.2em 0;
+    color: red;
 }
+
+
+
+
+
+#map {    
+    height: 400px;    
+    width: 70%;
+    display: inline-block;
+    }
+
+#panel {  
+    width: 25%;  
+    padding: 20px;  
+    display: inline-block;  
+    vertical-align: top;  
+    text-align: center;  
+    line-height: 42px;  
+}  
+
+.range-slider {  
+    width: 55%;  
+}  
+
+.step {  
+    width: 20%;  
+}  
+
+.step img {  
+    width: 100%;  
+} 
