@@ -20,7 +20,7 @@ function createMap(){
     getData(map);
 };
 
-function calculateMinValue(data){
+function calcMinValue(data){
     //create empty array to store all data values
     var allValues = [];
     //loop through each region
@@ -51,9 +51,19 @@ function calcPropRadius(attValue) {
 
 
 //function to convert markers to circle markers
-function pointToLayer(feature, latlng){
-    //Determine which attribute to visualize with proportional symbols
-    var attribute = "Pop_2015";
+// function pointToLayer(feature, latlng){
+//     //Determine which attribute to visualize with proportional symbols
+//     var attribute = "Pop_2015";
+
+
+
+//Example 2.1 NEW FORM EXAMPLE 3.13, REPLACES ABOVE...function to convert markers to circle markers
+function pointToLayer(feature, latlng, attributes){
+    //Step 4: Assign the current attribute based on the first index of the attributes array
+    var attribute = attributes[0];
+    //check
+    console.log(attribute);
+
 
     //create marker options
     var options = {
@@ -95,12 +105,28 @@ function pointToLayer(feature, latlng){
 };
 
 //Add circle markers for point features to the map
-function createPropSymbols(data){
+// function createPropSymbols(data){
+//     //create a Leaflet GeoJSON layer and add it to the map
+//     L.geoJson(data, {
+//         pointToLayer: pointToLayer
+//     }).addTo(map);
+// };
+
+
+//Example 2.1 NEW FROM 3.12, REPLACES ABOVE .Add circle markers for point features to the map
+function createPropSymbols(data, attributes){
     //create a Leaflet GeoJSON layer and add it to the map
     L.geoJson(data, {
-        pointToLayer: pointToLayer
+        pointToLayer: function(feature, latlng){
+            return pointToLayer(feature, latlng, attributes);
+        }
     }).addTo(map);
 };
+
+
+
+
+
 
 
 
@@ -118,28 +144,72 @@ function createSequenceControls(){
      document.querySelector('#panel').insertAdjacentHTML('beforeend','<button class="step" id="reverse"></button>');
      document.querySelector('#panel').insertAdjacentHTML('beforeend','<button class="step" id="forward"></button>');
       //replace button content with images
-    document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/left-arrow.png'>")
-    document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/right-arrow.png'>")
+    document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/reverse.png'>")
+    document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/forward.png'>")
 };
 
 
 
 
 
-//Step 2: Import GeoJSON data
-function getData(){
+// //Step 2: Import GeoJSON data
+// function getData(){
+//     //load the data
+//     fetch("data/UkraineOblastPopulationHistoryLatLongNONUM_ZEROS.geojson")
+//         .then(function(response){
+//             return response.json();
+//         })
+//         .then(function(json){
+//             //calculate minimum data value
+//             minValue = calculateMinValue(json);
+//             //call function to create proportional symbols
+//             createPropSymbols(json);
+//             createSequenceControls();
+//         })
+// };
+
+//Above Example 3.10...Step 3: build an attributes array from the data
+function processData(data){
+    //empty array to hold attributes
+    var attributes = [];
+
+    //properties of the first feature in the dataset
+    var properties = data.features[0].properties;
+
+    //push each attribute name into attributes array
+    for (var attribute in properties){
+        //only take attributes with population values
+        if (attribute.indexOf("Pop_") > -1){
+            attributes.push(attribute);
+        };
+    };
+
+    //check result
+    console.log(attributes);
+
+    return attributes;
+};
+
+
+
+
+
+function getData(map){
     //load the data
     fetch("data/UkraineOblastPopulationHistoryLatLongNONUM_ZEROS.geojson")
         .then(function(response){
             return response.json();
         })
         .then(function(json){
-            //calculate minimum data value
-            minValue = calculateMinValue(json);
-            //call function to create proportional symbols
-            createPropSymbols(json);
-            createSequenceControls();
+             //create an attributes array
+            var attributes = processData(json);
+            minValue = calcMinValue(json);
+            createPropSymbols(json, attributes);
+            createSequenceControls(attributes);
         })
 };
+
+
+
 
 document.addEventListener('DOMContentLoaded',createMap)
