@@ -2,7 +2,20 @@
 
 
 
-/* #map { height: 980px; } */
+
+
+#div2 {
+
+    font-family:    Noto Sans, sans-serif;
+    font-size:      12px;
+    /* font-weight:    bold; */
+
+}
+
+
+
+
+
 
 .leaflet-popup-content p {
     margin: 0.2em 0;
@@ -14,13 +27,13 @@
 
 
 #map {    
-    height: 400px;    
-    width: 70%;
+    height: 650px;    
+    width: 90%;
     display: inline-block;
     }
 
     #panel {  
-        width: 25%;  
+        width: 40%;  
         padding: 20px;  
         display: inline-block;  
         vertical-align: top;  

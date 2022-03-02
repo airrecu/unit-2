@@ -1,3 +1,11 @@
+
+// <!-- Arrow images sourced from the Noun Project Inc -->
+// <!-- Source data, State Statistics Service of Ukraine : http://database.ukrcensus.gov.ua/MULT/Database/Population/databasetree_en.asp -->
+// <!-- Accessed February 27, 2022 and March 1, 2022 -->
+
+
+
+
 //declare map variable globally so all functions have access
 var map;
 var minValue;
@@ -20,6 +28,8 @@ function createMap(){
     getData(map);
 };
 
+
+//calculates minimum value of the data set to use for calculating proportions
 function calcMinValue(data){
     //create empty array to store all data values
     var allValues = [];
@@ -42,7 +52,7 @@ function calcMinValue(data){
 //calculate the radius of each proportional symbol
 function calcPropRadius(attValue) {
     //constant factor adjusts symbol sizes evenly
-    var minRadius = 5;
+    var minRadius = 7;
     //Flannery Apperance Compensation formula
     var radius = 1.0083 * Math.pow(attValue/800000,0.5715) * minRadius
 
@@ -50,10 +60,6 @@ function calcPropRadius(attValue) {
 };
 
 
-//function to convert markers to circle markers
-// function pointToLayer(feature, latlng){
-//     //Determine which attribute to visualize with proportional symbols
-//     var attribute = "Pop_2015";
 
 
 
@@ -62,7 +68,7 @@ function pointToLayer(feature, latlng, attributes){
     //Step 4: Assign the current attribute based on the first index of the attributes array
     var attribute = attributes[0];
     //check
-    console.log(attribute);
+    // console.log(attribute);
 
 
     //create marker options
@@ -89,7 +95,11 @@ function pointToLayer(feature, latlng, attributes){
     //new2.2
      //add formatted attribute to popup content string
      var year = attribute.split("_")[1];
-     popupContent += "<p><b>Population in " + year + ":</b> " + feature.properties[attribute] + "</p>";
+     var noComma_population = feature.properties[attribute]
+     var yesComma_population = noComma_population.toLocaleString("en-US");
+
+
+     popupContent += "<p><b>Population in " + year + ":</b> " + yesComma_population + "</p>";
 
 
     //bind the popup to the circle marker
@@ -103,14 +113,6 @@ function pointToLayer(feature, latlng, attributes){
     //return the circle marker to the L.geoJson pointToLayer option
     return layer;
 };
-
-//Add circle markers for point features to the map
-// function createPropSymbols(data){
-//     //create a Leaflet GeoJSON layer and add it to the map
-//     L.geoJson(data, {
-//         pointToLayer: pointToLayer
-//     }).addTo(map);
-// };
 
 
 //Example 2.1 NEW FROM 3.12, REPLACES ABOVE .Add circle markers for point features to the map
@@ -126,12 +128,45 @@ function createPropSymbols(data, attributes){
 
 
 
+//Step 10: Resize proportional symbols according to new attribute values
+function updatePropSymbols(attribute){
+    map.eachLayer(function(layer){
+        if (layer.feature && layer.feature.properties[attribute]){
+            //update the layer style and popup
+
+            //access feature properties
+            var props = layer.feature.properties;
+
+            //update each feature's radius based on new attribute values
+            var radius = calcPropRadius(props[attribute]);
+            layer.setRadius(radius);
+
+            //add region to popup content string
+            var popupContent = "<p><b>Region:</b> " + props.Region + "</p>";
+
+            //add formatted attribute to panel content string
+            var year = attribute.split("_")[1];
+            var noComma_population = props[attribute]
+            var yesComma_population = noComma_population.toLocaleString("en-US");
+
+            popupContent += "<p><b>Population in " + year + ":</b> " + yesComma_population + "</p>";
+
+            
+
+            //update popup content            
+            popup = layer.getPopup();            
+            popup.setContent(popupContent).update();
+
+        };
+    });
+};
+
 
 
 
 
 //Step 1: Create new sequence controls
-function createSequenceControls(){
+function createSequenceControls(attributes){
     //create range input element (slider)
     var slider = "<input class='range-slider' type='range'></input>";
     document.querySelector("#panel").insertAdjacentHTML('beforeend',slider);
@@ -146,27 +181,61 @@ function createSequenceControls(){
       //replace button content with images
     document.querySelector('#reverse').insertAdjacentHTML('beforeend',"<img src='img/reverse.png'>")
     document.querySelector('#forward').insertAdjacentHTML('beforeend',"<img src='img/forward.png'>")
+
+    //START NEW FROM EXAMPLE 3.15
+    //Below Example 3.6 in createSequenceControls()
+    //Step 5: click listener for buttons
+    document.querySelectorAll('.step').forEach(function(step){
+        step.addEventListener("click", function(){
+            //sequence  //START NEW FROM 3.16
+            var index = document.querySelector('.range-slider').value;
+            
+            //Step 6: increment or decrement depending on button clicked
+            if (step.id == 'forward'){
+                index++;
+                //Step 7: if past the last attribute, wrap around to first attribute
+                index = index > 32 ? 0 : index;
+            } else if (step.id == 'reverse'){
+                index--;
+                //Step 7: if past the first attribute, wrap around to last attribute
+                index = index < 0 ? 32 : index;
+            };
+
+            //Step 8: update slider
+            document.querySelector('.range-slider').value = index;
+
+            // console.log(attributes[index])
+
+            //Called in both step button and slider event listener handlers
+            //Step 9: pass new attribute to update symbols
+            updatePropSymbols(attributes[index]);
+
+            //END NEW FROM 3.16
+        })
+    })
+
+    
+    //Step 5: input listener for slider
+    document.querySelector('.range-slider').addEventListener('input', function(){            
+        //sequence
+    });
+
+    //Step 5: input listener for slider
+    document.querySelector('.range-slider').addEventListener('input', function(){
+        //Step 6: get the new index value
+        var index = this.value;
+        updatePropSymbols(attributes[index]);
+
+        // console.log(attributes[index])
+        // console.log(index)
+    });
+    //END NEW FROM EXAMPLE 3.15
+
+
 };
 
 
 
-
-
-// //Step 2: Import GeoJSON data
-// function getData(){
-//     //load the data
-//     fetch("data/UkraineOblastPopulationHistoryLatLongNONUM_ZEROS.geojson")
-//         .then(function(response){
-//             return response.json();
-//         })
-//         .then(function(json){
-//             //calculate minimum data value
-//             minValue = calculateMinValue(json);
-//             //call function to create proportional symbols
-//             createPropSymbols(json);
-//             createSequenceControls();
-//         })
-// };
 
 //Above Example 3.10...Step 3: build an attributes array from the data
 function processData(data){
@@ -185,7 +254,7 @@ function processData(data){
     };
 
     //check result
-    console.log(attributes);
+    // console.log(attributes);
 
     return attributes;
 };
@@ -193,7 +262,7 @@ function processData(data){
 
 
 
-
+//Gets data from file with AJAX callback function, calls other functions
 function getData(map){
     //load the data
     fetch("data/UkraineOblastPopulationHistoryLatLongNONUM_ZEROS.geojson")
