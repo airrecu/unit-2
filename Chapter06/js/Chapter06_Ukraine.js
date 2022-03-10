@@ -29,6 +29,28 @@ function createMap(){
 };
 
 
+
+//ASK about the ... under the function name
+//TODO format the numbers wit commas
+//TODO comment that data was pulled on certain date, source may not be available due to war
+//TODO change symbology for Crimea and Sevastopol
+//TODO add Wheat and sky background to webpage, add flag somewhere
+//Example 1.2 line 1...PopupContent constructor function
+function PopupContent(properties, attribute){
+    this.properties = properties;
+    this.attribute = attribute;
+    this.year = attribute.split("_")[1];
+    this.population = this.properties[attribute];
+    this.formatted = "<p><b>City:</b> " + this.properties.Region + "</p><p><b>Population in " + this.year + ":</b> " + this.population + "</p>";
+};
+
+
+
+
+
+
+
+
 //calculates minimum value of the data set to use for calculating proportions
 function calcMinValue(data){
     //create empty array to store all data values
@@ -92,23 +114,30 @@ function pointToLayer(feature, latlng, attributes){
     //create circle marker layer
     var layer = L.circleMarker(latlng, options);
 
-    //build popup content string
-    var popupContent = "<p><b>Region:</b> " + feature.properties.Region //+ "</p><p><b>" + attribute + ":</b> " + feature.properties[attribute] + "</p>";
+    // //build popup content string
+    // var popupContent = "<p><b>Region:</b> " + feature.properties.Region //+ "</p><p><b>" + attribute + ":</b> " + feature.properties[attribute] + "</p>";
 
-    //new2.2
-     //add formatted attribute to popup content string
-     var year = attribute.split("_")[1];
-     var noComma_population = feature.properties[attribute]
-     var yesComma_population = noComma_population.toLocaleString("en-US");
-
-
-     popupContent += "<p><b>Population in " + year + ":</b> " + yesComma_population + "</p>";
+    // //new2.2
+    //  //add formatted attribute to popup content string
+    //  var year = attribute.split("_")[1];
+    //  var noComma_population = feature.properties[attribute]
+    //  var yesComma_population = noComma_population.toLocaleString("en-US");
 
 
-    //bind the popup to the circle marker
-    // layer.bindPopup(popupContent);
-    layer.bindPopup(popupContent, {
-        offset: new L.Point(0,-options.radius) 
+    //  popupContent += "<p><b>Population in " + year + ":</b> " + yesComma_population + "</p>";
+
+
+    // //bind the popup to the circle marker
+    // // layer.bindPopup(popupContent);
+    // layer.bindPopup(popupContent, {
+    //     offset: new L.Point(0,-options.radius) 
+
+
+    var popupContent = new PopupContent(feature.properties, attribute);
+
+    //bind the popup to the circle marker    
+    layer.bindPopup(popupContent.formatted, { 
+        offset: new L.Point(0,-options.radius)
     });
 
 
@@ -151,23 +180,37 @@ function updatePropSymbols(attribute){
 
             //Could add a condition here to show no value for Crimea by changing the color of the marker?
 
-            //add region to popup content string
-            var popupContent = "<p><b>Region:</b> " + props.Region + "</p>";
+            // //add region to popup content string
+            // var popupContent = "<p><b>Region:</b> " + props.Region + "</p>";
 
             
 
-            //add formatted attribute to panel content string
-            var year = attribute.split("_")[1];
-            var noComma_population = props[attribute]
-            var yesComma_population = noComma_population.toLocaleString("en-US");
+            // //add formatted attribute to panel content string
+            // var year = attribute.split("_")[1];
+            // var noComma_population = props[attribute]
+            // var yesComma_population = noComma_population.toLocaleString("en-US");
 
-            popupContent += "<p><b>Population in " + year + ":</b> " + yesComma_population + "</p>";
+            // popupContent += "<p><b>Population in " + year + ":</b> " + yesComma_population + "</p>";
 
             
 
-            //update popup content            
-            popup = layer.getPopup();            
-            popup.setContent(popupContent).update();
+            // //update popup content            
+            // popup = layer.getPopup();            
+            // popup.setContent(popupContent).update();
+
+
+
+        //Example 1.3 line 6...in UpdatePropSymbols()
+        var popupContent = new PopupContent(props, attribute);
+
+        //update popup with new content    
+        popup = layer.getPopup();    
+        popup.setContent(popupContent.formatted).update();
+
+
+
+
+
 
         };
     });
