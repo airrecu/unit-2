@@ -8,7 +8,7 @@
 
 //declare map variable globally so all functions have access
 var map;
-var minValue;
+var dataStats = {};
 
 //step 1 create map
 function createMap(){
@@ -30,18 +30,19 @@ function createMap(){
 
 
 
-//ASK about the ... under the function name
-//TODO format the numbers wit commas
-//TODO comment that data was pulled on certain date, source may not be available due to war
+//ASK about the ... under the PopupContent function name
 //TODO change symbology for Crimea and Sevastopol
 //TODO add Wheat and sky background to webpage, add flag somewhere
+
 //Example 1.2 line 1...PopupContent constructor function
 function PopupContent(properties, attribute){
     this.properties = properties;
     this.attribute = attribute;
     this.year = attribute.split("_")[1];
     this.population = this.properties[attribute];
-    this.formatted = "<p><b>City:</b> " + this.properties.Region + "</p><p><b>Population in " + this.year + ":</b> " + this.population + "</p>";
+    var num = this.population;
+    var commas = num.toLocaleString("en-US");
+    this.formatted = "<p><b>Region:</b> " + this.properties.Region + "</p><p><b>Population in " + this.year + ":</b> " + commas + "</p>";
 };
 
 
@@ -52,23 +53,25 @@ function PopupContent(properties, attribute){
 
 
 //calculates minimum value of the data set to use for calculating proportions
-function calcMinValue(data){
+function calcStats(data){
     //create empty array to store all data values
     var allValues = [];
     //loop through each region
     for(var region of data.features){
         //loop through each year
-        for(var year = 1989; year <= 2021; year+=5){
+        for(var year = 1989; year <= 2021; year+=1){
               //get population for current year
               var value = region.properties["Pop_"+ String(year)];
               //add value to array
               allValues.push(value);
         }
     }
-    //get minimum value of our array
-    var minValue = Math.min(...allValues)
-
-    return minValue;
+     //get min, max, mean stats for our array
+     dataStats.min = Math.min(...allValues);
+     dataStats.max = Math.max(...allValues);
+     //calculate meanValue
+     var sum = allValues.reduce(function(a, b){return a+b;});
+     dataStats.mean = sum/ allValues.length;
 }
 
 //calculate the radius of each proportional symbol
@@ -151,7 +154,8 @@ function updatePropSymbols(attribute){
 
         // finds the population year based on the underscore
         var year = attribute.split("_")[1];
-        //Connects to Temporal legend
+
+        //update temporal legend
         document.querySelector("span.year").innerHTML = year;
 
 
@@ -204,6 +208,42 @@ function createLegend(attributes){
 
             //Creates teh temporaral legend and sets intitial year of legend to 1989 (not defined directly/dynamically by dataset)
             container.innerHTML = '<p class="temporalLegend">Population in <span class="year">1989</span></p>';
+
+            //Step 1: start attribute legend svg string
+            var svg = '<svg id="attribute-legend" width="160px" height="60px">';
+
+             //array of circle names to base loop on
+            var circles = ["max", "mean", "min"];
+
+            //Step 2: loop to add each circle and text to svg string
+            for (var i=0; i<circles.length; i++){
+                
+                
+                //Step 3: assign the r and cy attributes  
+                var radius = calcPropRadius(dataStats[circles[i]]);  
+                var cy = 59 - radius;  
+
+                //circle string
+                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#F47821" fill-opacity="0.8" stroke="#000000" cx="30"/>'; 
+            
+            
+                //evenly space out labels            
+            var textY = i * 20 + 20;            
+            
+            //text string
+            num = Math.round(dataStats[circles[i]]*100)/100            
+            var commas = num.toLocaleString("en-US");
+            svg += '<text id="' + circles[i] + '-text" x="65" y="' + textY + '">' + commas + "" + '</text>';
+            
+            
+            };
+
+            //close svg string
+            svg += "</svg>";
+
+            //add attribute legend svg to container
+            container.insertAdjacentHTML('beforeend',svg);
+
 
             return container;
         }
@@ -370,7 +410,7 @@ function getData(map){
         .then(function(json){
              //create an attributes array
             var attributes = processData(json);
-            minValue = calcMinValue(json);
+            calcStats(json);
             createPropSymbols(json, attributes);
             createSequenceControls(attributes);
             createLegend(attributes)

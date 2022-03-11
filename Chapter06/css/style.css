@@ -27,7 +27,7 @@
 
 
 #map {    
-    height: 650px;    
+    height: 450px;    
     width: 90%;
     display: inline-block;
 
@@ -82,4 +82,18 @@
     
     #reverse {  
         float: left;  
+    }
+
+
+    .legend-control-container {
+        width: 150px;
+        font-weight: bold;
+        background-color: rgba(255,255,255,0.8);
+        padding: 10px;
+        text-align: center;
+        border: solid gray 1px;
+    }
+    
+    .legend-control-container p{
+         margin: 0;
     }
