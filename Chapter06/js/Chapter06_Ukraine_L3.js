@@ -1,5 +1,6 @@
 
 // <!-- Arrow images sourced from the Noun Project Inc -->
+// <!-- Flag image in public domaine from: https://commons.wikimedia.org/wiki/File:Marka3.jpg -->
 // <!-- Source data, State Statistics Service of Ukraine : http://database.ukrcensus.gov.ua/MULT/Database/Population/databasetree_en.asp -->
 // <!-- Accessed February 27, 2022 and March 1, 2022 -->
 
@@ -99,11 +100,15 @@ function pointToLayer(feature, latlng, attributes){
     // console.log(attribute);
 
 
+// #DFA915 Ukraine yellow
+// #2F82B6 blue
+
+
     //create marker options
     var options = {
-        fillColor: "#ff7800",
-        color: "#000",
-        weight: 1,
+        fillColor: "#DFA915",
+        color: "#2F82B6",
+        weight: 5,
         opacity: 1,
         fillOpacity: 0.8
     };
@@ -224,7 +229,7 @@ function createLegend(attributes){
                 var cy = 59 - radius;  
 
                 //circle string
-                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#F47821" fill-opacity="0.8" stroke="#000000" cx="30"/>'; 
+                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#DFA915" fill-opacity="0.8" stroke="#2F82B6" cx="30"/>'; 
             
             
                 //evenly space out labels            
