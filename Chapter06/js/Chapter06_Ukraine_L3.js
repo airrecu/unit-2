@@ -14,6 +14,7 @@ var dataStats = {};
 //step 1 create map
 function createMap(){
 
+
     //create the map
     map = L.map('map', {
         center: [48.0, 31.2],
@@ -100,8 +101,8 @@ function pointToLayer(feature, latlng, attributes){
     // console.log(attribute);
 
 
-// #DFA915 Ukraine yellow
-// #2F82B6 blue
+// #DFA915 Old Ukraine flag yellow
+// #2F82B6 Old Ukraine flag blue
 
 
     //create marker options
@@ -200,7 +201,6 @@ function updatePropSymbols(attribute){
     });
 };
 
-
 function createLegend(attributes){
     var LegendControl = L.Control.extend({
         options: {
@@ -212,10 +212,10 @@ function createLegend(attributes){
             var container = L.DomUtil.create('div', 'legend-control-container');
 
             //Creates teh temporaral legend and sets intitial year of legend to 1989 (not defined directly/dynamically by dataset)
-            container.innerHTML = '<p class="temporalLegend">Population in <span class="year">1989</span></p>';
+            container.innerHTML = '<p class="temporalLegend"><u>Population in <span class="year">1989</u></span></p>';
 
             //Step 1: start attribute legend svg string
-            var svg = '<svg id="attribute-legend" width="160px" height="60px">';
+            var svg = '<svg id="attribute-legend" width="200px" height="70px">';
 
              //array of circle names to base loop on
             var circles = ["max", "mean", "min"];
@@ -226,11 +226,12 @@ function createLegend(attributes){
                 
                 //Step 3: assign the r and cy attributes  
                 var radius = calcPropRadius(dataStats[circles[i]]);  
-                var cy = 59 - radius;  
+                var cy = 70 - radius;  
+                // var cy = 59 - radius;  
 
                 //circle string
-                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#DFA915" fill-opacity="0.8" stroke="#2F82B6" cx="30"/>'; 
-            
+                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#DFA915" fill-opacity="0.8" stroke="#2F82B6" cx="40"/>'; 
+                // svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#DFA915" fill-opacity="0.8" stroke="#2F82B6" cx="30"/>'; 
             
                 //evenly space out labels            
             var textY = i * 20 + 20;            
@@ -238,7 +239,7 @@ function createLegend(attributes){
             //text string
             num = Math.round(dataStats[circles[i]]*100)/100            
             var commas = num.toLocaleString("en-US");
-            svg += '<text id="' + circles[i] + '-text" x="65" y="' + textY + '">' + commas + "" + '</text>';
+            svg += '<text id="' + circles[i] + '-text" x="105" y="' + textY + '">' + commas + "" + '</text>';
             
             
             };
